@@ -2,6 +2,7 @@
 #
 # See documentation in:
 # https://docs.scrapy.org/en/latest/topics/spider-middleware.html
+import random
 
 from scrapy import signals
 
@@ -101,3 +102,14 @@ class SpecSpiderDownloaderMiddleware:
 
     def spider_opened(self, spider):
         spider.logger.info('Spider opened: %s' % spider.name)
+
+
+class UserAgentMiddleware:
+    def __init__(self):
+        self.user_agents_list = []
+        with open('./resources/user-agents.txt') as f:
+            self.user_agents_list = f.readlines()
+
+    def process_request(self, request, spider):
+        user_agent = random.choice(self.user_agents_list)
+        request.headers['User-Agent'] = user_agent
