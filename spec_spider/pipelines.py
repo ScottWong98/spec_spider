@@ -31,6 +31,11 @@ class Cpu2017Pipeline:
         self.fp_rate_exporter.start_exporting()
         self.fp_speed_exporter.start_exporting()
 
+        self.cnt_int_rate = 0
+        self.cnt_int_speed = 0
+        self.cnt_fp_rate = 0
+        self.cnt_fp_speed = 0
+
     def close_siper(self, spider):
         self.int_rate_exporter.finish_exporting()
         self.int_speed_exporter.finish_exporting()
@@ -44,20 +49,19 @@ class Cpu2017Pipeline:
 
     def process_item(self, item, spider):
         # suite: CINT2017_speed, CINT2017_rate, CFP2017_speed, CFP2017_rate
-        cnt_int_rate, cnt_int_speed, cnt_fp_rate, cnt_fp_speed = 0, 0, 0, 0
         if item['Suite'] == 'CINT2017_speed':
             self.int_speed_exporter.export_item(item)
-            cnt_int_speed += 1
-            spider.logger.info(f"Crawl item {cnt_int_speed} for CINT2017_speed")
+            self.cnt_int_speed += 1
+            spider.logger.info(f"Crawl item {self.cnt_int_speed} for CINT2017_speed")
         elif item['Suite'] == 'CINT2017_rate':
             self.int_rate_exporter.export_item(item)
-            cnt_int_rate += 1
-            spider.logger.info(f"Crawl item {cnt_int_rate} for CINT2017_rate")
+            self.cnt_int_rate += 1
+            spider.logger.info(f"Crawl item {self.cnt_int_rate} for CINT2017_rate")
         elif item['Suite'] == 'CFP2017_speed':
             self.fp_speed_exporter.export_item(item)
-            cnt_fp_speed += 1
-            spider.logger.info(f"Crawl item {cnt_fp_speed} for CFP2017_speed")
+            self.cnt_fp_speed += 1
+            spider.logger.info(f"Crawl item {self.cnt_fp_speed} for CFP2017_speed")
         elif item['Suite'] == 'CFP2017_rate':
             self.fp_rate_exporter.export_item(item)
-            cnt_fp_rate += 1
-            spider.logger.info(f"Crawl item {cnt_fp_rate} for CFP2017_rate")
+            self.cnt_fp_rate += 1
+            spider.logger.info(f"Crawl item {self.cnt_fp_rate} for CFP2017_rate")

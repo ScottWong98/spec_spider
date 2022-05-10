@@ -19,7 +19,7 @@ class Cpu2017Spider(scrapy.Spider):
     def parse(self, response):
         # suite: CINT2017_speed, CINT2017_rate, CFP2017_speed, CFP2017_rate
         suite = response.css('.idx_table h2 a::attr(name)').get()
-        for tr_selector in response.css('tr.historical')[:1]:
+        for tr_selector in response.css('tr.historical'):
             url_suffix = tr_selector.css('a::attr(href)').get()
             detail_url = get_detail_url(response.url, url_suffix)
             yield scrapy.Request(
@@ -32,35 +32,55 @@ class Cpu2017Spider(scrapy.Spider):
 
         info_dict = self._parse_info(response)
         benchmark_dict = self._parse_benchmark(response, suite)
-        return {
-            'Suite': suite,
-            **info_dict,
-            **benchmark_dict,
-            'URL Suffix': url_suffix
-        }
+        return {'Suite': suite, **info_dict, **benchmark_dict, 'URL Suffix': url_suffix}
 
+    def _parse_hw_info(self, response):
+        hw_keys = [
+            'CPU Name',
+            'Max MHz',
+            'Nominal',
+            'Enabled',
+            'Orderable',
+            'L1',
+            'L2',
+            'L3',
+            'Other Cache',
+            'Memory',
+            'Storage',
+            'Other HW',
+        ]
+        hw_values = [
+            delete_tag_and_br(value)
+            for value in response.css('#Hardware tbody td').getall()
+        ]
+        hw_values = hw_values[: len(hw_keys)]
+        return {k: v for k, v in zip(hw_keys, hw_values)}
+
+    def _parse_sw_info(self, response):
+        sw_keys = [
+            'OS',
+            'Compiler',
+            'Parallel',
+            'Firmware',
+            'File System',
+            'System State',
+            'Base Pointers',
+            'Peak Pointers',
+            'Other SW',
+        ]
+        sw_values = [
+            delete_tag_and_br(value)
+            for value in response.css('#Software tbody td').getall()
+        ]
+        sw_values = sw_values[: len(sw_keys)]
+        return {k: v for k, v in zip(sw_keys, sw_values)}
 
     def _parse_info(self, response):
         system_bar = [
             delete_tag_and_br(item) for item in response.css('td.systembar p').getall()
         ]
-        hardware_dict = {
-            k: delete_tag_and_br(v)
-            for k, v in zip(
-                response.css('#Hardware tbody a::text').getall(),
-                response.css('#Hardware tbody td').getall(),
-            )
-        }
-        hardware_dict.pop('Other', None)
-        software_dict = {
-            k: delete_tag_and_br(v)
-            for k, v in zip(
-                response.css('#Software tbody a::text').getall(),
-                response.css('#Software tbody td').getall(),
-            )
-        }
-        software_dict.pop('Other', None)
-        software_dict.pop('Peak Pointers', None)
+        hw_dict = self._parse_hw_info(response)
+        sw_dict = self._parse_sw_info(response)
         return {
             'Hardware Vendor': system_bar[0],
             'System Name': system_bar[1],
@@ -72,8 +92,8 @@ class Cpu2017Spider(scrapy.Spider):
             'Test Date': response.css('#test_date_val::text').get(),
             'HW Avail': response.css('#hw_avail_val::text').get(),
             'SW Avail': response.css('#sw_avail_val::text').get(),
-            **hardware_dict,
-            **software_dict,
+            **hw_dict,
+            **sw_dict,
         }
 
     def _parse_benchmark(self, response, suite):
