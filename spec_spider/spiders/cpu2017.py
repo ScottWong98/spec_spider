@@ -19,8 +19,10 @@ class Cpu2017Spider(scrapy.Spider):
     def parse(self, response):
         # suite: CINT2017_speed, CINT2017_rate, CFP2017_speed, CFP2017_rate
         suite = response.css('.idx_table h2 a::attr(name)').get()
-        for tr_selector in response.css('tr.historical'):
+        for tr_selector in response.css('tbody tr'):
             url_suffix = tr_selector.css('a::attr(href)').get()
+            if url_suffix is None or (url_suffix is not None and len(url_suffix) == 0):
+                continue
             detail_url = get_detail_url(response.url, url_suffix)
             yield scrapy.Request(
                 detail_url,

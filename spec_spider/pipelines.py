@@ -5,7 +5,8 @@
 
 
 # useful for handling different item types with a single interface
-from itemadapter import ItemAdapter
+import os
+from datetime import datetime
 from scrapy.exporters import CsvItemExporter
 
 
@@ -14,12 +15,21 @@ class SpecSpiderPipeline:
         return item
 
 
+def get_file_path(suite):
+    now = datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
+    folder = f"data/{now}"
+    if not os.path.exists(folder):
+        os.makedirs(folder)
+
+    return f"{folder}/{suite}.csv"
+
+
 class Cpu2017Pipeline:
     def __init__(self):
-        self.int_rate_file = open('data/cint2017_rate.csv', 'wb')
-        self.int_speed_file = open('data/cint2017_speed.csv', 'wb')
-        self.fp_rate_file = open('data/cfp2017_rate.csv', 'wb')
-        self.fp_speed_file = open('data/cfp2017_speed.csv', 'wb')
+        self.int_rate_file = open(get_file_path('cint2017_rate'), 'wb')
+        self.int_speed_file = open(get_file_path('cint2017_speed'), 'wb')
+        self.fp_rate_file = open(get_file_path('cfp2017_rate'), 'wb')
+        self.fp_speed_file = open(get_file_path('cfp2017_speed'), 'wb')
 
         self.int_rate_exporter = CsvItemExporter(self.int_rate_file)
         self.int_speed_exporter = CsvItemExporter(self.int_speed_file)

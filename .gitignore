@@ -1,4 +1,4 @@
 .idea/
 *.pyc
 .vscode/
-data/*.csv
+data/*
