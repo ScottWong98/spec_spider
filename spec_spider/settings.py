@@ -69,6 +69,7 @@ DOWNLOADER_MIDDLEWARES = {
 ITEM_PIPELINES = {
    'spec_spider.pipelines.SpecSpiderPipeline': 543,
    'spec_spider.pipelines.Cpu2017Pipeline': 300,
+   'spec_spider.pipelines.Cpu2006Pipeline': 301, 
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

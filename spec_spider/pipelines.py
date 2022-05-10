@@ -15,63 +15,93 @@ class SpecSpiderPipeline:
         return item
 
 
-def get_file_path(suite):
+def get_file_path(benchmark, suite):
     now = datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
-    folder = f"data/{now}"
+    folder = f"data/{benchmark}/{now}"
     if not os.path.exists(folder):
         os.makedirs(folder)
 
     return f"{folder}/{suite}.csv"
 
 
-class Cpu2017Pipeline:
-    def __init__(self):
-        self.int_rate_file = open(get_file_path('cint2017_rate'), 'wb')
-        self.int_speed_file = open(get_file_path('cint2017_speed'), 'wb')
-        self.fp_rate_file = open(get_file_path('cfp2017_rate'), 'wb')
-        self.fp_speed_file = open(get_file_path('cfp2017_speed'), 'wb')
+class CpuPipeline:
+    cint_name: str
+    rint_name: str
+    cfp_name: str
+    rfp_name: str
+    benchmark: str
 
-        self.int_rate_exporter = CsvItemExporter(self.int_rate_file)
-        self.int_speed_exporter = CsvItemExporter(self.int_speed_file)
-        self.fp_rate_exporter = CsvItemExporter(self.fp_rate_file)
-        self.fp_speed_exporter = CsvItemExporter(self.fp_speed_file)
+    def __init__(self,):
+        self.cint_file = open(get_file_path(self.benchmark, self.cint_name), 'wb')
+        self.rint_file = open(get_file_path(self.benchmark, self.rint_name), 'wb')
+        self.cfp_file = open(get_file_path(self.benchmark, self.cfp_name), 'wb')
+        self.rfp_file = open(get_file_path(self.benchmark, self.rfp_name), 'wb')
 
-        self.int_rate_exporter.start_exporting()
-        self.int_speed_exporter.start_exporting()
-        self.fp_rate_exporter.start_exporting()
-        self.fp_speed_exporter.start_exporting()
+        self.cint_exporter = CsvItemExporter(self.cint_file)
+        self.rint_exporter = CsvItemExporter(self.rint_file)
+        self.cfp_exporter = CsvItemExporter(self.cfp_file)
+        self.rfp_exporter = CsvItemExporter(self.rfp_file)
 
-        self.cnt_int_rate = 0
-        self.cnt_int_speed = 0
-        self.cnt_fp_rate = 0
-        self.cnt_fp_speed = 0
+        self.cint_exporter.start_exporting()
+        self.rint_exporter.start_exporting()
+        self.cfp_exporter.start_exporting()
+        self.rfp_exporter.start_exporting()
+
+        self.cint_cnt = 0
+        self.rint_cnt = 0
+        self.cfp_cnt = 0
+        self.rfp_cnt = 0
 
     def close_siper(self, spider):
-        self.int_rate_exporter.finish_exporting()
-        self.int_speed_exporter.finish_exporting()
-        self.fp_rate_exporter.finish_exporting()
-        self.fp_speed_exporter.finish_exporting()
+        self.cint_exporter.finish_exporting()
+        self.rfp_exporter.finish_exporting()
+        self.cfp_exporter.finish_exporting()
+        self.rfp_exporter.finish_exporting()
 
-        self.int_rate_file.close()
-        self.int_speed_file.close()
-        self.fp_rate_file.close()
-        self.fp_speed_file.close()
+        self.cint_file.close()
+        self.rint_file.close()
+        self.cfp_file.close()
+        self.rfp_file.close()
 
     def process_item(self, item, spider):
         # suite: CINT2017_speed, CINT2017_rate, CFP2017_speed, CFP2017_rate
-        if item['Suite'] == 'CINT2017_speed':
-            self.int_speed_exporter.export_item(item)
-            self.cnt_int_speed += 1
-            spider.logger.info(f"Crawl item {self.cnt_int_speed} for CINT2017_speed")
-        elif item['Suite'] == 'CINT2017_rate':
-            self.int_rate_exporter.export_item(item)
-            self.cnt_int_rate += 1
-            spider.logger.info(f"Crawl item {self.cnt_int_rate} for CINT2017_rate")
-        elif item['Suite'] == 'CFP2017_speed':
-            self.fp_speed_exporter.export_item(item)
-            self.cnt_fp_speed += 1
-            spider.logger.info(f"Crawl item {self.cnt_fp_speed} for CFP2017_speed")
-        elif item['Suite'] == 'CFP2017_rate':
-            self.fp_rate_exporter.export_item(item)
-            self.cnt_fp_rate += 1
-            spider.logger.info(f"Crawl item {self.cnt_fp_rate} for CFP2017_rate")
+        if item['Suite'] == self.cint_name:
+            self.cint_exporter.export_item(item)
+            self.cint_cnt += 1
+            spider.logger.info(f"Crawl item {self.cint_cnt} for {self.cint_name}")
+        elif item['Suite'] == self.rint_name:
+            self.rint_exporter.export_item(item)
+            self.rint_cnt += 1
+            spider.logger.info(f"Crawl item {self.rint_cnt} for {self.rint_name}")
+        elif item['Suite'] == self.cfp_name:
+            self.cfp_exporter.export_item(item)
+            self.cfp_cnt += 1
+            spider.logger.info(f"Crawl item {self.cfp_cnt} for {self.cfp_name}")
+        elif item['Suite'] == self.rfp_name:
+            self.rfp_exporter.export_item(item)
+            self.rfp_cnt += 1
+            spider.logger.info(f"Crawl item {self.rfp_cnt} for {self.rfp_name}")
+
+
+class Cpu2017Pipeline(CpuPipeline):
+    # suite: CINT2017_speed, CINT2017_rate, CFP2017_speed, CFP2017_rate
+    cint_name: str = 'CINT2017_speed'
+    rint_name: str = 'CINT2017_rate'
+    cfp_name: str = 'CFP2017_speed'
+    rfp_name: str = 'CFP2017_rate'
+    benchmark: str = 'cpu2017'
+
+    def __init__(self):
+        super().__init__()
+
+
+class Cpu2006Pipeline(CpuPipeline):
+    # suite: SPECint, SPECint_rate, SPECfp, SPECfp_rate
+    cint_name: str = 'SPECint'
+    rint_name: str = 'SPECint_rate'
+    cfp_name: str = 'SPECfp'
+    rfp_name: str = 'SPECfp_rate'
+    benchmark: str = 'cpu2006'
+
+    def __init__(self):
+        super().__init__()
