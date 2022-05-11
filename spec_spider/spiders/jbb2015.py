@@ -18,7 +18,7 @@ class Jbb2015Spider(scrapy.Spider):
 
     def parse(self, response):
         suite = response.css('.idx_table h2 a::attr(name)').get()
-        for tr_selector in response.css('tbody tr')[:1]:
+        for tr_selector in response.css('tbody tr'):
             url_suffix = tr_selector.css('a::attr(href)').get()
             max_jOPS, critical_jOPS = tr_selector.css('td::text').getall()[-2:]
             if url_suffix is None or (url_suffix is not None and len(url_suffix) == 0):
