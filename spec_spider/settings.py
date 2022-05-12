@@ -72,6 +72,7 @@ ITEM_PIPELINES = {
    'spec_spider.pipelines.Cpu2006Pipeline': 301, 
    'spec_spider.pipelines.Jbb2015Pipeline': 302, 
    'spec_spider.pipelines.Jvm2008Pipeline': 303, 
+   'spec_spider.pipelines.Ssj2008Pipeline': 304, 
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
