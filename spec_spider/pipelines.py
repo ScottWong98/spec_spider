@@ -122,3 +122,20 @@ class Jbb2015Pipeline:
         self.exporter.export_item(item)
         self.cnt += 1
         spider.logger.info(f"Crawl item {self.cnt} for jbb2015")
+
+
+class Jvm2008Pipeline:
+    def __init__(self,):
+        self.file = open(get_file_path('jvm2008', 'jvm2008'), 'wb')
+        self.exporter = CsvItemExporter(self.file)
+        self.exporter.start_exporting()
+        self.cnt = 0
+
+    def close_siper(self, spider):
+        self.exporter.finish_exporting()
+        self.file.close()
+
+    def process_item(self, item, spider):
+        self.exporter.export_item(item)
+        self.cnt += 1
+        spider.logger.info(f"Crawl item {self.cnt} for jvm2008")
