@@ -25,6 +25,9 @@ class Ssj2008Spider(scrapy.Spider):
             )
 
     def parse_detail(self, response, url_suffix):
+        if response.css('.noncompliant').get() is not None:
+            return {'Status': 'Non-Compliant'}
+
         suite = delete_tag_and_br(response.css('.benchmarkName::text').get())
         info_dict = self._parse_info(response)
         bm_dict = self._parse_benchmark(response)

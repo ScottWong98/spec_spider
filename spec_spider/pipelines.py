@@ -153,6 +153,7 @@ class Ssj2008Pipeline:
         self.file.close()
 
     def process_item(self, item, spider):
-        self.exporter.export_item(item)
-        self.cnt += 1
-        spider.logger.info(f"Crawl item {self.cnt} for ssj2008")
+        if item.get('Status') is None:
+            self.exporter.export_item(item)
+            self.cnt += 1
+            spider.logger.info(f"Crawl item {self.cnt} for ssj2008")
