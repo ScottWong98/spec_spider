@@ -88,7 +88,7 @@ class Jbb2015Spider(scrapy.Spider):
         os_dict['OS Vendor'] = os_dict.pop('Vendor')
         os_dict['OS Version'] = os_dict.pop('Version')
 
-        jvm_dict = self.get_dict(response, 3, [1, 2, 4])
+        jvm_dict = self.get_dict(response, 3, [9, 10, 12])
         jvm_dict['JVM Name'] = jvm_dict.pop('Name')
         jvm_dict['JVM Vendor'] = jvm_dict.pop('Vendor')
         jvm_dict['JVM Version'] = jvm_dict.pop('Version')

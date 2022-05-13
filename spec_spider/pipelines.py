@@ -108,20 +108,50 @@ class Cpu2006Pipeline(CpuPipeline):
 
 
 class Jbb2015Pipeline:
+    composite_name = 'SPECjbb2015-Composite'
+    multijvm_name = 'SPECjbb2015-MultiJVM'
+    distributed_name = 'SPECjbb2015-Distributed'
+
     def __init__(self,):
-        self.file = open(get_file_path('jbb2015', 'jbb2015'), 'wb')
-        self.exporter = CsvItemExporter(self.file)
-        self.exporter.start_exporting()
-        self.cnt = 0
+        self.composite_file = open(get_file_path('jbb2015', self.composite_name), 'wb')
+        self.multijvm_file = open(get_file_path('jbb2015', self.multijvm_name), 'wb')
+        self.distributed_file = open(
+            get_file_path('jbb2015', self.distributed_name), 'wb'
+        )
+
+        self.composite_exporter = CsvItemExporter(self.composite_file)
+        self.multijvm_exporter = CsvItemExporter(self.multijvm_file)
+        self.distributed_exporter = CsvItemExporter(self.distributed_file)
+
+        self.composite_exporter.start_exporting()
+        self.multijvm_exporter.start_exporting()
+        self.distributed_exporter.start_exporting()
+
+        self.c_cnt = 0
+        self.m_cnt = 0
+        self.d_cnt = 0
 
     def close_siper(self, spider):
-        self.exporter.finish_exporting()
-        self.file.close()
+        self.composite_exporter.finish_exporting()
+        self.multijvm_exporter.finish_exporting()
+        self.distributed_exporter.finish_exporting()
+        self.composite_file.close()
+        self.multijvm_file.close()
+        self.distributed_file.close()
 
     def process_item(self, item, spider):
-        self.exporter.export_item(item)
-        self.cnt += 1
-        spider.logger.info(f"Crawl item {self.cnt} for jbb2015")
+        if item['Suite'] == self.composite_name:
+            self.composite_exporter.export_item(item)
+            self.c_cnt += 1
+            spider.logger.info(f"Crawl item {self.c_cnt} for {self.composite_name}")
+        elif item['Suite'] == self.multijvm_name:
+            self.multijvm_exporter.export_item(item)
+            self.m_cnt += 1
+            spider.logger.info(f"Crawl item {self.m_cnt} for {self.multijvm_name}")
+        elif item['Suite'] == self.distributed_name:
+            self.distributed_exporter.export_item(item)
+            self.d_cnt += 1
+            spider.logger.info(f"Crawl item {self.d_cnt} for {self.distributed_name}")
 
 
 class Jvm2008Pipeline:

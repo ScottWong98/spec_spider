@@ -58,7 +58,9 @@ data
 │       └── CINT2017_speed.csv
 ├── jbb2015
 │   └── 2022_05_11_22_56_03
-│       └── jbb2015.csv
+│       ├── SPECjbb2015-Composite.csv
+│       ├── SPECjbb2015-Distributed.csv
+│       └── SPECjbb2015-MultiJVM.csv
 ├── jvm2008
 │   ├── 2022_05_12_11_35_01
 │   │   └── jvm2008.csv
