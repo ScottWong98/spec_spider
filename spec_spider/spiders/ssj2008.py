@@ -31,8 +31,13 @@ class Ssj2008Spider(scrapy.Spider):
         suite = delete_tag_and_br(response.css('.benchmarkName::text').get())
         info_dict = self._parse_info(response)
         bm_dict = self._parse_benchmark(response)
-        hw_dict = self._parse_hw(response)
-        sw_dict = self._parse_sw(response)
+        hw_dict, sw_dict = {}, {}
+        for tbody in response.css('.configSection tbody'):
+            first_key = tbody.css('tr a::text').get()
+            if 'Hardware Vendor' in first_key:
+                hw_dict = self._parse_hw(tbody)
+            elif 'Power Management' in first_key:
+                sw_dict = self._parse_sw(tbody)
         return {
             'Suite': suite,
             **info_dict,
@@ -64,9 +69,9 @@ class Ssj2008Spider(scrapy.Spider):
         bm_dict["Benchmark"] = trs[11].css('td::text').getall()[-1]
         return bm_dict
 
-    def _parse_hw(self, response):
-        keys = response.css('.configSection tbody')[0].css('tr a::text').getall()
-        values = response.css('.configSection tbody')[0].css('tr td::text').getall()
+    def _parse_hw(self, tbody):
+        keys = tbody.css('tr a::text').getall()
+        values = tbody.css('tr td::text').getall()
         keys = [re.sub(':', '', key) for key in keys]
         hw_dict = {k: v for k, v in zip(keys, values)}
         hw_dict.pop('Keyboard', None)
@@ -75,9 +80,9 @@ class Ssj2008Spider(scrapy.Spider):
         hw_dict.pop('Optical Drives', None)
         return hw_dict
 
-    def _parse_sw(self, response):
-        keys = response.css('.configSection tbody')[1].css('tr a::text').getall()
-        values = response.css('.configSection tbody')[1].css('tr td::text').getall()
+    def _parse_sw(self, tbody):
+        keys = tbody.css('tr a::text').getall()
+        values = tbody.css('tr td::text').getall()
         keys = [re.sub(':', '', key) for key in keys]
         sw_dict = {k: v for k, v in zip(keys, values)}
         sw_dict.pop('JVM Command-line Options', None)

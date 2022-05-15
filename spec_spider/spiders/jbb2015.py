@@ -46,8 +46,8 @@ class Jbb2015Spider(scrapy.Spider):
         }
 
         overall_dict = self.parse_overall_sut(response)
-        hw_dict = self.parse_hw(response)
-        sw_dict = self.parse_sw(response)
+        hw_dict = self._parse_hw(response)
+        sw_dict = self._parse_sw(response)
 
         return {
             'Suite': suite,
@@ -69,38 +69,47 @@ class Jbb2015Spider(scrapy.Spider):
             for k, v in zip(trs.css('a::text').getall(), trs.css('td::text').getall())
         }
 
-    def parse_hw(self, response):
-        selector = response.css('table.alternate')[2].css('tr')
-        trs = SelectorList()
+    def _parse_hw(self, response):
         indices = [i for i in range(29)]
         indices = indices[1:2] + indices[6:16] + indices[17:]
-        [trs.append(selector[idx]) for idx in indices]
-        hw_dict = {
-            k: v
-            for k, v in zip(trs.css('a::text').getall(), trs.css('td::text').getall())
-        }
+        hw_dict = self._get_dict(response, 2, indices)
         hw_dict['System Name'] = hw_dict.pop('Name')
         return hw_dict
+                
+        # [trs.append(selector[idx]) for idx in indices]
+        # hw_dict = {
+        #     k: v
+        #     for k, v in zip(trs.css('a::text').getall(), trs.css('td::text').getall())
+        # }
+        # hw_dict['System Name'] = hw_dict.pop('Name')
+        # return hw_dict
 
-    def parse_sw(self, response):
-        os_dict = self.get_dict(response, 3, [1, 2, 4])
+    def _parse_sw(self, response):
+        os_dict = self._get_dict(response, 3, [1, 2, 4])
         os_dict['OS Name'] = os_dict.pop('Name')
         os_dict['OS Vendor'] = os_dict.pop('Vendor')
         os_dict['OS Version'] = os_dict.pop('Version')
 
-        jvm_dict = self.get_dict(response, 3, [9, 10, 12])
+        jvm_dict = self._get_dict(response, 3, [9, 10, 12])
         jvm_dict['JVM Name'] = jvm_dict.pop('Name')
         jvm_dict['JVM Vendor'] = jvm_dict.pop('Vendor')
         jvm_dict['JVM Version'] = jvm_dict.pop('Version')
 
         return {**os_dict, **jvm_dict}
 
-    def get_dict(self, response, sid, tr_ids):
+    def _get_dict(self, response, sid, tr_ids):
         selector = response.css('table.alternate')[sid].css('tr')
-        trs = SelectorList()
-        [trs.append(selector[idx]) for idx in tr_ids]
-        return {
-            k: v
-            for k, v in zip(trs.css('a::text').getall(), trs.css('td::text').getall())
-        }
+        keys, values = [], []
+        for idx, tr in enumerate(selector):
+            if idx not in tr_ids:
+                continue
+            keys.append(tr.css('a::text').get())
+            values.append(delete_tag_and_br(tr.css('td').getall()[-1]))
+        return {k:v for k, v in zip(keys, values)}
+        # trs = SelectorList()
+        # [trs.append(selector[idx]) for idx in tr_ids]
+        # return {
+        #     k: v
+        #     for k, v in zip(trs.css('a::text').getall(), trs.css('td::text').getall())
+        # }
 
