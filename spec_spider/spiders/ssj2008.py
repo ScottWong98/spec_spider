@@ -34,9 +34,10 @@ class Ssj2008Spider(scrapy.Spider):
         hw_dict, sw_dict = {}, {}
         for tbody in response.css('.configSection tbody'):
             first_key = tbody.css('tr a::text').get()
-            if 'Hardware Vendor' in first_key:
+            keys = tbody.css('tr a::text').getall()
+            if len(keys) > 25 and 'Hardware Vendor' in first_key:
                 hw_dict = self._parse_hw(tbody)
-            elif 'Power Management' in first_key:
+            elif len(keys) > 15 and 'Power Management' in first_key:
                 sw_dict = self._parse_sw(tbody)
         return {
             'Suite': suite,
