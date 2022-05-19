@@ -14,11 +14,19 @@ A Spider for SPEC
 
 In root folder, use these commands to start spider.
 ```
-$ bash bin/cral_cpu2017.sh
-$ bash bin/cral_cpu2006.sh
-$ bash bin/cral_jbb2015.sh
-$ bash bin/cral_jvm2008.sh
-$ bash bin/cral_ssj2008.sh
+$ bash bin/crawl_cpu2017.sh
+$ bash bin/crawl_cpu2006.sh
+$ bash bin/crawl_jbb2015.sh
+$ bash bin/crawl_jvm2008.sh
+$ bash bin/crawl_ssj2008.sh
+```
+
+If you want clean all the data, use these commands:
+```
+$ bash bin/extract_cpu.sh
+$ bash bin/extract_jbb2015.sh
+$ bash bin/extract_jvm2008.sh
+$ bash bin/extract_ssj2008.sh
 ```
 
 ## Data
@@ -64,4 +72,18 @@ data
 ├── jvm2008
 │   ├── 2022_05_12_11_35_01
 │   │   └── jvm2008.csv
+```
+
+The cleaned data is stored in `data/clean` folder, like this:
+
+```
+data/clean
+├── cpu
+│   ├── cpu2006.csv
+│   └── cpu2017.csv
+├── java
+│   ├── jbb2015.csv
+│   └── jvm2008.csv
+└── power
+    └── ssj2008.csv
 ```
