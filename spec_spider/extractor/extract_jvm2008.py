@@ -129,7 +129,7 @@ class Jvm2008Extrator:
         self.df.to_csv(os.path.join(target_folder, filename), index=False)
 
     def _get_cores_per_chip(self):
-        self.df['Cores Per Chip'] = self.df['Total Cores'] / self.df['Chips']
+        self.df['Cores Per Chip'] = self.df['Total Cores'] // self.df['Chips']
 
     def _get_memory_number(self):
         self.df['Memory Number'] = self.df['Memory'].apply(

@@ -273,7 +273,6 @@ class Cpu2006Extrator(CpuExtractor):
             'Cores Per Chip',
             'Chips',
             'Total Cores',
-            'Max Chips',
             'L1 Cache',
             'L2 Cache',
             'L3 Cache',
