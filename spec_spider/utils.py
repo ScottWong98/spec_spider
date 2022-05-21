@@ -203,7 +203,12 @@ def clean_date_1(item):
     m = month_mapper[m[:3]]
     y = int(y)
     if len(str(y)) == 2:
-        y = int(f"20{str(y)}")
+        if y < 50:
+            y = int(f"20{str(y)}")
+        else:
+            y = int(f"19{str(y)}")
+    if y == 2098:
+        y = 1998
     return f"{y}-{m}-{d}"
 
 
@@ -228,7 +233,12 @@ def clean_date_2(item):
     m = month_mapper[m[:3]]
     d, m, y = int(d), int(m), int(y)
     if len(str(y)) == 2:
-        y = int(f"20{str(y)}")
+        if y < 50:
+            y = int(f"20{str(y)}")
+        else:
+            y = int(f"19{str(y)}")
+    if y == 2098:
+        y = 1998
     return f"{y}-{m}-{d}"
 
 
@@ -240,7 +250,12 @@ def clean_date_3(item):
     m = month_mapper[m]
     d, m, y = int(d), int(m), int(y)
     if len(str(y)) == 2:
-        y = int(f"20{str(y)}")
+        if y < 50:
+            y = int(f"20{str(y)}")
+        else:
+            y = int(f"19{str(y)}")
+    if y == 2098:
+        y = 1998
     return f"{y}-{m}-{d}"
 
 
